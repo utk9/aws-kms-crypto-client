@@ -53,4 +53,6 @@ const crypto = require('crypto');
  		}
  		return pPlainTextDataKey;
  	}
- }
+}
+
+module.exports = KMSClient;

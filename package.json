@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/utk9/aws-kms-test/issues"
   },
-  "homepage": "https://github.com/utk9/aws-kms-test#readme"
+  "homepage": "https://github.com/utk9/aws-kms-test#readme",
+  "dependencies": {
+    "aws-sdk": "^2.32.0"
+  }
 }
