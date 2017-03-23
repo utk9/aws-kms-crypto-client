@@ -15,13 +15,7 @@ const crypto = require('crypto');
  	}
 
  	decrypt (data) {
- 		const pPlainTextDataKey = Promise.resolve(this._plainTextDataKey);
- 		if (!this._plainTextDataKey) {
- 			const { encryptedDataKey } = config.readConfig('./config.');
- 			pPlainTextDataKey = this._client.decrypt({ CipherText: Buffer.from(encryptedDataKey, 'base64') }).promise();
- 		}
-
- 		return pPlainTextDataKey
+ 		return this._getPlainTextDataKey()
  			.then((dataKey) => {
  				const decipher = crypto.createDecipher('aes256', dataKey);
  				let decrypted = decipher.update(data, 'hex', 'utf8');
@@ -33,9 +27,30 @@ const crypto = require('crypto');
  			})
  	}
 
+ 	encrypt (data) {
+ 		return this._getPlainTextDataKey()
+ 			.then((dataKey) => {
+ 				const cipher = crypto.createCipher('aes256', dataKey);
+ 				let encrypted = cipher.update(data, 'utf8', 'hex');
+ 				encrypted += encrypted.final('hex');
+ 				return encrypted;
+ 			})
+ 			.catch((err) => {
+ 				return null;
+ 			})
+ 	}
+
+ 	// should be called after done using the client, to remove plain text data key form memory
  	flushPlainTextDataKey() {
  		this._plainTextDataKey = null;
  	}
 
-
+ 	_getPlainTextDataKey() {
+ 		const pPlainTextDataKey = Promise.resolve(this._plainTextDataKey);
+ 		if (!this._plainTextDataKey) {
+ 			const { encryptedDataKey } = config.readConfig('./config.');
+ 			pPlainTextDataKey = this._client.decrypt({ CipherText: Buffer.from(encryptedDataKey, 'base64') }).promise();
+ 		}
+ 		return pPlainTextDataKey;
+ 	}
  }
